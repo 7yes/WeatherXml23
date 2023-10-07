@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:gravity="center"
+    tools:context=".ui.StartFragment">
+
+    <TextView
+        android:id="@+id/tv_initial_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+       style="@style/mStyle"
+        android:text="@string/city"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
+
+    <EditText
+        android:id="@+id/et_city"
+        android:autofillHints="City"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="32.dp"
+        android:hint="@string/city"
+        android:inputType="text"
+        android:imeOptions="actionDone"
+        android:maxEms="20"
+        android:maxLines="1"
+        android:singleLine="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_initial_city" />
+    <Button
+        android:id="@+id/btn_go"
+        android:text="@string/next"
+        android:enabled="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_city"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
