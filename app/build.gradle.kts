@@ -74,5 +74,6 @@ dependencies {
     implementation ("com.squareup.picasso:picasso:2.71828")
     //DataStore
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
-
+    //livedata and coroutines
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
 }
