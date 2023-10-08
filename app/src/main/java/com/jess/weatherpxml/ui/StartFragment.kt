@@ -19,7 +19,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.jess.weatherpxml.R
@@ -43,7 +43,7 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
 class StartFragment : Fragment() {
     private var _binding: FragmentStartBinding? = null
     private val binding get() = _binding!!
-    private val viewmodel by viewModels<HomeViewModel>()
+    private val viewmodel by activityViewModels<HomeViewModel>()
 
     companion object {
         const val LOCATION_PERMISSIONS_CODE = 100
@@ -55,7 +55,7 @@ class StartFragment : Fragment() {
     ): View {
         _binding = FragmentStartBinding.inflate(layoutInflater, container, false)
         binding.btnGo.setOnClickListener {
-            getCityForecast()
+            getCityForecast(binding.etCity.text.toString().lowercase())
 //            if (checkPermissions()) { //todo
 //                //permission Granted
 //                getCityForecast()
@@ -69,8 +69,8 @@ class StartFragment : Fragment() {
                 withContext(Dispatchers.Main) {
                      Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
                 }
-               if(it.isNotEmpty()&& viewmodel.shouldOpenHome.value == true)
-                navigateToHome()
+                if(it.isNotEmpty()&& viewmodel.shouldOpenHome.value == true)
+                getCityForecast(it)
             }
         }
         binding.etCity.doOnTextChanged { _, _, _, _ ->
@@ -86,6 +86,7 @@ class StartFragment : Fragment() {
 
                 ResultState.LOADING -> binding.progressCircular.isVisible = true
                 is ResultState.SUCCESS -> {
+                    viewmodel.updateCityData(state.results)
                     binding.progressCircular.isVisible = false
                    saveToDataStore(state.results.city)
                     if(viewmodel.shouldOpenHome.value == true)
@@ -115,8 +116,8 @@ class StartFragment : Fragment() {
         it[stringPreferencesKey("city")].orEmpty()
     }
 
-    private fun getCityForecast() {
-        viewmodel.getCityWeather(binding.etCity.text.toString().lowercase())
+    private fun getCityForecast(city:String) {
+        viewmodel.getCityWeather(city)
         hideKeyboard()
     }
 
@@ -154,7 +155,7 @@ class StartFragment : Fragment() {
         if (requestCode == LOCATION_PERMISSIONS_CODE) {
             if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                 //permission granted
-                getCityForecast()
+                getCityForecast(binding.etCity.text.toString().lowercase())
             }
         }
     }
