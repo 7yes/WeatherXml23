@@ -7,17 +7,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import com.jess.weatherpxml.R
 import com.jess.weatherpxml.core.hideKeyboard
 import com.jess.weatherpxml.databinding.FragmentStartBinding
 import dagger.hilt.android.AndroidEntryPoint
 
+// with more time we could create a separate class to request permission but because this is the
+// only place where is required I keep it here
 @AndroidEntryPoint
 class StartFragment : Fragment() {
     private var _binding: FragmentStartBinding? = null
@@ -44,18 +46,32 @@ class StartFragment : Fragment() {
         }
         binding.etCity.doOnTextChanged { _, _, _, _ ->
             validateText()
-           binding.btnGo.isEnabled = shouldEnableBtnGo()
+            binding.btnGo.isEnabled=shouldEnableBtnGo()
         }
+viewmodel.state.observe(viewLifecycleOwner){ state ->
+   when(state){
+       is ResultState.ERROR -> {binding.progressCircular.isVisible=false
+           Toast.makeText(requireContext(), state.error.message, Toast.LENGTH_SHORT).show()
+       }
+       ResultState.LOADING -> binding.progressCircular.isVisible=true
+       is ResultState.SUCCESS -> {binding.progressCircular.isVisible=false
+           Toast.makeText(requireContext(), state.results.city, Toast.LENGTH_SHORT).show()
 
+           //findNavController().navigate(R.id.action_startFragment_to_homeFragment)
+       }
+       is ResultState.ERROR_CONECTION -> {
+           binding.progressCircular.isVisible=false
+           Toast.makeText(requireContext(), state.error , Toast.LENGTH_SHORT).show()
+       }
+   }
+}
         return binding.root
     }
 
     private fun getCityForecast() {
         viewmodel.getCityWeather(binding.etCity.text.toString().lowercase())
         hideKeyboard()
-
-        findNavController().navigate(R.id.action_startFragment_to_homeFragment)
-    }
+  }
 
     private fun validateText() {
         val regex = "^[a-zA-Z\\s]+"
@@ -64,8 +80,6 @@ class StartFragment : Fragment() {
     }
 
     private fun shouldEnableBtnGo() = binding.etCity.text.toString().length>3
-
-
     private fun requestLocationPermission() {
         ActivityCompat.requestPermissions(
             requireActivity(),
@@ -73,14 +87,11 @@ class StartFragment : Fragment() {
             LOCATION_PERMISSIONS_CODE
         )
     }
-
     private fun checkPermissions(): Boolean {
         val fineLocationPermission = ContextCompat.checkSelfPermission(
-            requireContext(), ACCESS_FINE_LOCATION
-        )
+            requireContext(), ACCESS_FINE_LOCATION)
         val coarseLocationPermission = ContextCompat.checkSelfPermission(
-            requireContext(), ACCESS_COARSE_LOCATION
-        )
+            requireContext(), ACCESS_COARSE_LOCATION)
         return fineLocationPermission == PackageManager.PERMISSION_GRANTED && coarseLocationPermission == PackageManager.PERMISSION_GRANTED
     }
 
@@ -97,7 +108,6 @@ class StartFragment : Fragment() {
             }
         }
     }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

@@ -1,7 +1,8 @@
 package com.jess.weatherpxml.domain
 
-import com.jess.weatherpxml.data.model.WeatherModel
+import com.jess.weatherpxml.domain.model.WeatherInfo
+import com.jess.weatherpxml.domain.utils.Resource
 
 interface WeatherRepo {
-    suspend fun getCityWeather(city:String): WeatherModel?
+    suspend fun getCityWeather(city:String): Resource<WeatherInfo>
 }
