@@ -56,6 +56,7 @@ class StartFragment : Fragment() {
         _binding = FragmentStartBinding.inflate(layoutInflater, container, false)
         binding.btnGo.setOnClickListener {
             getCityForecast(binding.etCity.text.toString().lowercase())
+            viewmodel.updateNavigationStatus(true)
 //            if (checkPermissions()) { //todo
 //                //permission Granted
 //                getCityForecast()
@@ -65,12 +66,12 @@ class StartFragment : Fragment() {
 //            }
         }
         lifecycleScope.launch {
-            readFromDataStore().collect(){
+            readFromDataStore().collect() {
                 withContext(Dispatchers.Main) {
-                     Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
                 }
-                if(it.isNotEmpty()&& viewmodel.shouldOpenHome.value == true)
-                getCityForecast(it)
+                if (it.isNotEmpty() && viewmodel.shouldOpenHome.value == true)
+                    getCityForecast(it)
             }
         }
         binding.etCity.doOnTextChanged { _, _, _, _ ->
@@ -88,9 +89,9 @@ class StartFragment : Fragment() {
                 is ResultState.SUCCESS -> {
                     viewmodel.updateCityData(state.results)
                     binding.progressCircular.isVisible = false
-                   saveToDataStore(state.results.city)
-                    if(viewmodel.shouldOpenHome.value == true)
-                    navigateToHome()
+                    saveToDataStore(state.results.city)
+                    if (viewmodel.shouldOpenHome.value == true)
+                        navigateToHome()
                 }
 
                 is ResultState.ERROR_CONECTION -> {
@@ -101,10 +102,12 @@ class StartFragment : Fragment() {
         }
         return binding.root
     }
+
     private fun navigateToHome() {
         findNavController().navigate(R.id.action_startFragment_to_homeFragment)
-        viewmodel.updateNavigationStatus()
+        viewmodel.updateNavigationStatus(false)
     }
+
     private fun saveToDataStore(city: String) {
         lifecycleScope.launch {
             requireContext().dataStore.edit {
@@ -112,11 +115,12 @@ class StartFragment : Fragment() {
             }
         }
     }
+
     private fun readFromDataStore() = requireContext().dataStore.data.map {
         it[stringPreferencesKey("city")].orEmpty()
     }
 
-    private fun getCityForecast(city:String) {
+    private fun getCityForecast(city: String) {
         viewmodel.getCityWeather(city)
         hideKeyboard()
     }

@@ -44,8 +44,8 @@ class HomeViewModel @Inject constructor(private val useCaseCity: GetWeatherUseCa
         }
     }
 
-    fun updateNavigationStatus() {
-        _shouldOpenHome.value = false
+    fun updateNavigationStatus(nav:Boolean) {
+        _shouldOpenHome.value = nav
     }
     fun updateCityData(results: WeatherInfo) {
         _result.value = results

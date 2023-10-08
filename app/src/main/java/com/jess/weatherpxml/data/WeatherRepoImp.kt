@@ -12,6 +12,8 @@ class WeatherRepoImp(private val weatherService: WeatherService) : WeatherRepo {
     //With more time  we could implement room DB so if the Api is no t responding we can get data from room
     override suspend fun getCityWeather(city: String): Resource<WeatherInfo> {
        return try {
+          val b= weatherService.getCityWeather(city)
+           println("vamosss ${b?.sys?.country}")
         Resource.Success(data= weatherService.getCityWeather(city)?.toDomain() )
         }catch (e:Exception){
             e.printStackTrace()
