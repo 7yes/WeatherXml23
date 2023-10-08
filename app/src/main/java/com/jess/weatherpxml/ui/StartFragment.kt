@@ -55,20 +55,21 @@ class StartFragment : Fragment() {
     ): View {
         _binding = FragmentStartBinding.inflate(layoutInflater, container, false)
         binding.btnGo.setOnClickListener {
-            if (checkPermissions()) {
-                //permission Granted
-                getCityForecast()
-            } else {
-                // ask for permission
-                requestLocationPermission()
-            }
+            getCityForecast()
+//            if (checkPermissions()) { //todo
+//                //permission Granted
+//                getCityForecast()
+//            } else {
+//                // ask for permission
+//                requestLocationPermission()
+//            }
         }
         lifecycleScope.launch {
             readFromDataStore().collect(){
                 withContext(Dispatchers.Main) {
                      Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
                 }
-               if(it.isNotEmpty())
+               if(it.isNotEmpty()&& viewmodel.shouldOpenHome.value == true)
                 navigateToHome()
             }
         }
@@ -87,6 +88,8 @@ class StartFragment : Fragment() {
                 is ResultState.SUCCESS -> {
                     binding.progressCircular.isVisible = false
                    saveToDataStore(state.results.city)
+                    if(viewmodel.shouldOpenHome.value == true)
+                    navigateToHome()
                 }
 
                 is ResultState.ERROR_CONECTION -> {
@@ -99,6 +102,7 @@ class StartFragment : Fragment() {
     }
     private fun navigateToHome() {
         findNavController().navigate(R.id.action_startFragment_to_homeFragment)
+        viewmodel.updateNavigationStatus()
     }
     private fun saveToDataStore(city: String) {
         lifecycleScope.launch {

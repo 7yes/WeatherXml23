@@ -18,6 +18,9 @@ class HomeViewModel @Inject constructor(private val useCaseCity: GetWeatherUseCa
     private val _state = MutableLiveData<ResultState>()
     val state: LiveData<ResultState> = _state
 
+    private val _shouldOpenHome  = MutableLiveData<Boolean>(true)
+    val shouldOpenHome: LiveData<Boolean> = _shouldOpenHome
+
     fun getCityWeather(city: String) {
         _state.value = ResultState.LOADING
         viewModelScope.launch(Dispatchers.IO) {
@@ -34,26 +37,8 @@ class HomeViewModel @Inject constructor(private val useCaseCity: GetWeatherUseCa
                 _state.value = ResultState.ERROR(e)
             }
         }
-//        viewModelScope.launch(Dispatchers.IO) {
-//            _state.value?.isLoading = true
-//            delay(2000)
-//            _state.value?.error = null
-//            val result = useCaseCity(city)
-//            println("vams ${result.data} ")
-//            println("vams ${result.message} ")
-//            when (result) {
-//                is Resource.Error -> {
-//                    _state.value?.error = result.message
-//                    _state.value?.isLoading = false
-//                    _state.value?.weatherInfo = null
-//                }
-//
-//                is Resource.Success -> {
-//                    _state.value?.error = null
-//                    _state.value?.isLoading = false
-//                    _state.value?.weatherInfo = result.data
-//                }
-//            }
-//        }
+    }
+    fun updateNavigationStatus() {
+        _shouldOpenHome.value = false
     }
 }
