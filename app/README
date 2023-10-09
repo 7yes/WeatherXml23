@@ -1,0 +1,48 @@
+# My Weather app
+
+This is my Android project for weather. It is a simple app that allows users to get the current weather.
+
+In the first fragment there are two buttons:
+
+    * Next button : it is disable until enduser type at least 4 characters, the app will take you to the next frag if the city exists,
+        if it doesn't exists or there are no data o connection, it will show a toast to handle the error
+
+    * Use my location button: it will ask to accept the permission, this feature is disable until enduser grant the permission,
+        after is granted just click in the "Use My Location" button again and thats it.
+
+ *** important, the location takes the last location so if is test it in the AVD, it will get you to LA(google office),
+    if your use a physical device  the app will get your actual location.
+
+The app is
+    -   MVVM architecture
+    -   Datastore
+    -   Dependency Injection Hilt
+    -   Navigation implemented
+    -   Clean Architecture
+    -   Has extension extention function: for mappers  and  core>extension.
+    -   Work with UI States
+    -   Use sealed classes
+    -   Single Activity multi frag
+    -   Retrofit
+    -   Coroutines
+    -   lived data and flows
+    -   Mappers to keep data the data independent for data layer, I like to use mappers to data model, data base entity and domain for UI.
+    -   Sealed class to make the Api call , it will help for future kind of API calls just need to add it in the seal classe after that it
+        will ask to complete where is need it thru the code.
+    -   the app icon is set for different  Api version.
+    -   Use datastore to save the last successful location when the app is reopen.
+
+Sealed Classes
+    WeatherState is to handle UI States
+    Resource: resource has data and error, to take any data from Api call it is encapsulated in resource.
+    EndPointType : to handle the Api call expected.
+
+    Finally the code is clean I did my best to make it self explanatory. it has 3 layers
+        -   presentation UI layer
+        -   Domain: business logic, for that reason I use the UseCase, ready for business logic
+        -   Data: the repository interphase in domain and repository impl in data, in this layer
+            room can be use it if need it.
+
+If you have any questions or feedback, please feel free to contact me at yesid_android@proton.me
+
+ Enjoy :) . the cheery is some Animation to make the app more Engaging

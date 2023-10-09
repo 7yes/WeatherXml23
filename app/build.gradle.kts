@@ -70,8 +70,6 @@ dependencies {
     // Location Services
     implementation ("com.google.android.gms:play-services-location:20.0.0")
 
-    //Picasso
-    implementation ("com.squareup.picasso:picasso:2.71828")
     //DataStore
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
     //livedata and coroutines
