@@ -13,6 +13,12 @@ interface WeatherApi {
         @Query("appid") apiKey: String = API_KEY
 
     ): Response<WeatherModel>
+    @GET(PATH)
+    suspend fun getLatLonForecast(
+        @Query("lon") lon: Double,
+        @Query("lat") lat: Double,
+        @Query("appid") apiKey: String = API_KEY
+    ): Response<WeatherModel>
 
     companion object {
         const val BASE_URL = "https://api.openweathermap.org/"

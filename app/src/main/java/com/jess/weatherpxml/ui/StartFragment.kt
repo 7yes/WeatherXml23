@@ -94,6 +94,8 @@ class StartFragment : Fragment() {
             }
         }
         binding.btnLocation.setOnClickListener {
+
+
             if (checkPermissions()) { //todo
                 //permission Granted
                 Toast.makeText(requireContext(), "GPS activated", Toast.LENGTH_SHORT).show()
@@ -157,8 +159,9 @@ class StartFragment : Fragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSIONS_CODE) {
             if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                //permission granted
-                getCityForecast(binding.etCity.text.toString().lowercase())
+                //permission granted todo
+                //getCityForecast(binding.etCity.text.toString().lowercase())
+                Toast.makeText(requireContext(), "GPS activated 2", Toast.LENGTH_SHORT).show()
             }
         }
     }

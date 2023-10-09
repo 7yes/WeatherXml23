@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jess.weatherpxml.core.isNull
+import com.jess.weatherpxml.domain.model.EndPointType
 import com.jess.weatherpxml.domain.model.WeatherInfo
 import com.jess.weatherpxml.domain.usecases.GetWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +30,7 @@ class HomeViewModel @Inject constructor(private val useCaseCity: GetWeatherUseCa
         _state.value = ResultState.LOADING
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val data = useCaseCity(city).data
+                val data = useCaseCity(EndPointType.WITH_CITY(city)).data
                 withContext(Dispatchers.Main) {
                     if (data.isNull()) {
                         _state.value =

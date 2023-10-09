@@ -2,7 +2,7 @@ package com.jess.weatherpxml.di
 
 import com.jess.weatherpxml.data.WeatherApi
 import com.jess.weatherpxml.data.WeatherRepoImp
-import com.jess.weatherpxml.data.model.WeatherService
+import com.jess.weatherpxml.data.WeatherService
 import com.jess.weatherpxml.domain.WeatherRepo
 import dagger.Module
 import dagger.Provides
@@ -38,7 +38,7 @@ class NetworkModule {
     @Singleton
     fun providesOkHttpClient()=OkHttpClient
         .Builder()
-        .connectTimeout(5, java.util.concurrent.TimeUnit.SECONDS)
+        .connectTimeout(5, TimeUnit.SECONDS)
         .readTimeout(5,TimeUnit.SECONDS)
         .writeTimeout(5,TimeUnit.SECONDS)
         .build()
