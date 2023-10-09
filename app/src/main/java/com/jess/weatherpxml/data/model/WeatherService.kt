@@ -5,6 +5,6 @@ import javax.inject.Inject
 
 class WeatherService @Inject constructor(private val weatherApi: WeatherApi){
     suspend fun getCityWeather(city:String): WeatherModel? {
-        return weatherApi.getCityForecast(city).body()
+        return weatherApi.getCityForecast(city = city).body()
     }
 }

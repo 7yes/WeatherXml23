@@ -20,7 +20,3 @@ interface WeatherApi {
         const val API_KEY = "8933ecd5eed0f2ebf8b423951c2fdc20"
     }
 }
-
-//https://api.openweathermap.org/data/2.5/weather?lat=44.34&lon=10.99&appid=8933ecd5eed0f2ebf8b423951c2fdc20
-//https://api.openweathermap.org/data/2.5/weather?q=Miami&appid=8933ecd5eed0f2ebf8b423951c2fdc20
-//https://api.openweathermap.org/data/2.5/weather?q=Miami,us&appid=8933ecd5eed0f2ebf8b423951c2fdc20

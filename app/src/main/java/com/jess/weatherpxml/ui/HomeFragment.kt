@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.jess.weatherpxml.R
 import com.jess.weatherpxml.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,6 +22,9 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
+        binding.btnChangeCity.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_startFragment)
+        }
         showData()
         return binding.root
     }
@@ -38,18 +42,27 @@ class HomeFragment : Fragment() {
                 "11d" -> R.drawable.m11d
                 "13d" -> R.drawable.m13d
                 "50d" -> R.drawable.m50d
+                "01n" -> R.drawable.m01n
+                "02n" -> R.drawable.m02n
+                "03n" -> R.drawable.m03n
+                "04n" -> R.drawable.m04n
+                "09n" -> R.drawable.m09n
+                "10n" -> R.drawable.m10n
+                "11n" -> R.drawable.m11n
+                "13n" -> R.drawable.m13n
+                "50n" -> R.drawable.m50n
                 else -> {
                     R.drawable.m13d
                 }
             }
         )
-        binding.tvTemp.text = "${data?.temp.toString()} °F"
+        binding.tvTemp.text = getString(R.string.faren, data?.temp.toString())
         binding.tvMain.text = data?.weather?.get(0)?.main
         binding.tvDescription.text = data?.weather?.get(0)?.description
-        binding.tvFeelsLike.text = "Feels like: ${data?.feelsLike.toString()}"
-        binding.tvVisibility.text = "Visibility: ${data?.visibility.toString()}"
-        binding.tvClouds.text = "Clouds: ${data?.clouds.toString()}"
-        binding.tvWind.text = "Wind: ${data?.windSpeed.toString()}"
+        binding.tvFeelsLike.text = getString(R.string.feels_like, data?.feelsLike.toString())
+        binding.tvVisibility.text = getString(R.string.visibility, data?.visibility.toString())
+        binding.tvClouds.text = getString(R.string.clouds, data?.clouds.toString())
+        binding.tvWind.text = getString(R.string.wind, data?.windSpeed.toString())
         binding.tvCity.text = data?.city
         binding.tvCountry.text = data?.country
     }

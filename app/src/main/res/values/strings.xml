@@ -1,8 +1,14 @@
 <resources>
     <string name="app_name">WeatherPXml</string>
-    <!-- TODO: Remove or change this placeholder text -->
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <!--Start Frag-->
     <string name="city">City</string>
     <string name="next">Next</string>
+    <string name="change_city">Change City</string>
+    <string name="wind">Wind: %1$s</string>
+    <string name="clouds">Clouds: %1$s</string>
+    <string name="visibility">Visibility: %1$s</string>
+    <string name="feels_like">Feels like: %1$s</string>
+    <string name="faren">%1$s °F</string>
 </resources>
