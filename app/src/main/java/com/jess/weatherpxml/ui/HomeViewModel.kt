@@ -1,9 +1,13 @@
 package com.jess.weatherpxml.ui
 
+import android.view.View
+import android.view.animation.AnimationUtils
+import android.view.animation.LinearInterpolator
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jess.weatherpxml.R
 import com.jess.weatherpxml.core.isNull
 import com.jess.weatherpxml.domain.model.EndPointType
 import com.jess.weatherpxml.domain.model.WeatherInfo
@@ -34,7 +38,7 @@ class HomeViewModel @Inject constructor(private val useCaseCity: GetWeatherUseCa
                 withContext(Dispatchers.Main) {
                     if (data.isNull()) {
                         _state.value =
-                            ResultState.ERROR_CONECTION("City dosen't exits or connection is lost")
+                            ResultState.ERROR_CONECTION("City doesn't exits or connection is lost")
                     } else {
                         _state.value = data?.let { ResultState.SUCCESS(it) }
                     }
@@ -50,5 +54,36 @@ class HomeViewModel @Inject constructor(private val useCaseCity: GetWeatherUseCa
     }
     fun updateCityData(results: WeatherInfo) {
         _result.value = results
+    }
+
+    fun getLatLonWeather(lon: Double, lat: Double) {
+        _state.value = ResultState.LOADING
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val data = useCaseCity(EndPointType.WITH_LOCATION(lon = lon, lat = lat)).data
+                withContext(Dispatchers.Main) {
+                    if (data.isNull()) {
+                        _state.value =
+                            ResultState.ERROR_CONECTION("City doesn't exits or connection is lost")
+                    } else {
+                        _state.value = data?.let { ResultState.SUCCESS(it) }
+                    }
+                }
+            } catch (e: Exception) {
+                _state.value = ResultState.ERROR(e)
+            }
+        }
+    }
+    fun rotationAnim(view: View) {
+        view.animate().apply {
+            duration = 1700
+            interpolator = LinearInterpolator()
+            rotation(720f)
+            start()
+        }
+    }
+    fun slideIcon(view: View) {
+        val slideUpAnimation = AnimationUtils.loadAnimation(view.context, R.anim.slide)
+        view.startAnimation(slideUpAnimation)
     }
 }

@@ -67,6 +67,12 @@ class HomeFragment : Fragment() {
         binding.tvCountry.text = data?.country
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewmodel.rotationAnim(binding.ivIcon)
+        viewmodel.slideIcon(binding.ivIcon)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
