@@ -11,4 +11,7 @@
     <string name="visibility">Visibility: %1$s</string>
     <string name="feels_like">Feels like: %1$s</string>
     <string name="faren">%1$s °F</string>
+    <string name="use_my_location">Use my Location</string>
+    <string name="lineee">---------------------------------</string>
+    <string name="or">OR</string>
 </resources>

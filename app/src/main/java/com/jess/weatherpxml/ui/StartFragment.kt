@@ -57,13 +57,6 @@ class StartFragment : Fragment() {
         binding.btnGo.setOnClickListener {
             getCityForecast(binding.etCity.text.toString().lowercase())
             viewmodel.updateNavigationStatus(true)
-//            if (checkPermissions()) { //todo
-//                //permission Granted
-//                getCityForecast()
-//            } else {
-//                // ask for permission
-//                requestLocationPermission()
-//            }
         }
         lifecycleScope.launch {
             readFromDataStore().collect() {
@@ -100,6 +93,15 @@ class StartFragment : Fragment() {
                 }
             }
         }
+        binding.btnLocation.setOnClickListener {
+            if (checkPermissions()) { //todo
+                //permission Granted
+                Toast.makeText(requireContext(), "GPS activated", Toast.LENGTH_SHORT).show()
+            } else {
+                // ask for permission
+                requestLocationPermission()
+            }
+        }
         return binding.root
     }
 
@@ -119,18 +121,15 @@ class StartFragment : Fragment() {
     private fun readFromDataStore() = requireContext().dataStore.data.map {
         it[stringPreferencesKey("city")].orEmpty()
     }
-
     private fun getCityForecast(city: String) {
         viewmodel.getCityWeather(city)
         hideKeyboard()
     }
-
     private fun validateText() {
         val regex = "^[a-zA-Z\\s]+"
         val validText = binding.etCity.text.toString().matches(regex.toRegex())
         if (!validText) binding.etCity.error = "Just Letters"
     }
-
     private fun shouldEnableBtnGo() = binding.etCity.text.toString().length > 3
     private fun requestLocationPermission() {
         ActivityCompat.requestPermissions(
