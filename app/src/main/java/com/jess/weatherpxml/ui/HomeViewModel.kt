@@ -86,4 +86,5 @@ class HomeViewModel @Inject constructor(private val useCaseCity: GetWeatherUseCa
         val slideUpAnimation = AnimationUtils.loadAnimation(view.context, R.anim.slide)
         view.startAnimation(slideUpAnimation)
     }
+
 }

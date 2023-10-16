@@ -25,6 +25,7 @@ The app is
     -   Single Activity multi frag
     -   Retrofit
     -   Coroutines
+    -   Testing
     -   lived data and flows
     -   Mappers to keep data the data independent for data layer, I like to use mappers to data model, data base entity and domain for UI.
     -   Sealed class to make the Api call , it will help for future kind of API calls just need to add it in the seal classe after that it

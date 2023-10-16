@@ -2,6 +2,7 @@ package com.jess.weatherpxml.ui
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -9,7 +10,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.datastore.core.DataStore
@@ -42,9 +45,20 @@ class StartFragment : Fragment() {
     private var _binding: FragmentStartBinding? = null
     private val binding get() = _binding!!
     private val viewmodel by activityViewModels<HomeViewModel>()
+
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    companion object {
-        const val LOCATION_PERMISSIONS_CODE = 100
+    private var hasCoarseGranted = false
+    private var hasFineGranted = false
+    private lateinit var multiplePermissionLauncher: ActivityResultLauncher<Array<String>>
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        multiplePermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                hasCoarseGranted = permissions[ACCESS_COARSE_LOCATION] ?: hasCoarseGranted
+                hasFineGranted = permissions[ACCESS_FINE_LOCATION] ?: hasFineGranted
+                if (hasFineGranted && hasCoarseGranted) getLocation()
+            }
     }
 
     override fun onCreateView(
@@ -53,11 +67,14 @@ class StartFragment : Fragment() {
     ): View {
         _binding = FragmentStartBinding.inflate(layoutInflater, container, false)
         fusedLocationProviderClient = FusedLocationProviderClient(requireContext())
-
-        lifecycleScope.launch {
-            readFromDataStore().collect() {
-                if (it.isNotEmpty() && viewmodel.shouldOpenHome.value == true)
-                    getCityForecast(it)
+        if (checkPermissions()&& viewmodel.shouldOpenHome.value == true) {
+            getLocation()
+        } else {
+            lifecycleScope.launch {
+                readFromDataStore().collect() {
+                    if (it.isNotEmpty() && viewmodel.shouldOpenHome.value == true)
+                        getCityForecast(it)
+                }
             }
         }
 
@@ -67,6 +84,7 @@ class StartFragment : Fragment() {
                     binding.progressCircular.isVisible = false
                     Toast.makeText(requireContext(), state.error.message, Toast.LENGTH_SHORT).show()
                 }
+
                 ResultState.LOADING -> binding.progressCircular.isVisible = true
                 is ResultState.SUCCESS -> {
                     viewmodel.updateCityData(state.results)
@@ -75,6 +93,7 @@ class StartFragment : Fragment() {
                     if (viewmodel.shouldOpenHome.value == true)
                         navigateToHome()
                 }
+
                 is ResultState.ERROR_CONECTION -> {
                     binding.progressCircular.isVisible = false
                     Toast.makeText(requireContext(), state.error, Toast.LENGTH_SHORT).show()
@@ -85,29 +104,52 @@ class StartFragment : Fragment() {
         return binding.root
     }
 
+    private fun checkPermissions(): Boolean = ContextCompat.checkSelfPermission(
+        requireContext(),
+        ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+        requireContext(),
+        ACCESS_COARSE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+
+    private fun requestPermissions() {
+        hasCoarseGranted = ContextCompat.checkSelfPermission(
+            requireContext(),
+            ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        hasFineGranted = ContextCompat.checkSelfPermission(
+            requireContext(),
+            ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val permissionRequest: MutableList<String> = ArrayList()
+        if (!hasCoarseGranted) permissionRequest.add(ACCESS_COARSE_LOCATION)
+        if (!hasFineGranted) permissionRequest.add(ACCESS_FINE_LOCATION)
+        if (permissionRequest.isNotEmpty()) multiplePermissionLauncher.launch(permissionRequest.toTypedArray())
+    }
+
     private fun initListners() {
         binding.btnNext.setOnClickListener {
             getCityForecast(binding.etCity.text.toString().lowercase())
             viewmodel.updateNavigationStatus(true)
         }
         binding.btnLocation.setOnClickListener {
-
-                if (ActivityCompat.checkSelfPermission(requireContext(), ACCESS_FINE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                        requireContext(), ACCESS_COARSE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) { requestLocationPermission()
-                    return@setOnClickListener
-                }
-                fusedLocationProviderClient.lastLocation.addOnSuccessListener {
-                    viewmodel.getLatLonWeather(it.longitude, it.latitude)
-                }
-               viewmodel.updateNavigationStatus(true)
+            if (checkPermissions()) {
+                getLocation()
+            } else requestPermissions()
         }
         binding.etCity.doOnTextChanged { _, _, _, _ ->
             validateText()
             binding.btnNext.isEnabled = shouldEnableBtnGo()
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getLocation() {
+        fusedLocationProviderClient.lastLocation.addOnSuccessListener {
+            viewmodel.getLatLonWeather(it.longitude, it.latitude)
+        }
+        viewmodel.updateNavigationStatus(true)
     }
 
     private fun navigateToHome() {
@@ -126,23 +168,20 @@ class StartFragment : Fragment() {
     private fun readFromDataStore() = requireContext().dataStore.data.map {
         it[stringPreferencesKey("city")].orEmpty()
     }
+
     private fun getCityForecast(city: String) {
         viewmodel.getCityWeather(city)
         hideKeyboard()
     }
+
     private fun validateText() {
         val regex = "^[a-zA-Z\\s]+"
         val validText = binding.etCity.text.toString().matches(regex.toRegex())
         if (!validText) binding.etCity.error = "Just Letters"
     }
+
     private fun shouldEnableBtnGo() = binding.etCity.text.toString().length > 3
-    private fun requestLocationPermission() {
-        ActivityCompat.requestPermissions(
-            requireActivity(),
-            arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION),
-            LOCATION_PERMISSIONS_CODE
-        )
-    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
