@@ -44,7 +44,9 @@ class HomeViewModel @Inject constructor(private val useCaseCity: GetWeatherUseCa
                     }
                 }
             } catch (e: Exception) {
-                _state.value = ResultState.ERROR(e)
+                withContext(Dispatchers.Main){
+                    _state.value = ResultState.ERROR(e)
+                }
             }
         }
     }
